@@ -1,0 +1,46 @@
+#include <Arduino.h>
+/*********
+  Rui Santos
+  Complete project details at https://randomnerdtutorials.com  
+*********/
+
+// include library to read and write from flash memory
+#include <EEPROM.h>
+
+// define the number of bytes you want to access
+#define EEPROM_SIZE 128
+char ssid[64] = "test123";
+char ssid2[64] = "Hallo Welt";
+char string1[64] = "";
+
+// constants won't change. They're used here to set pin numbers:
+
+void setup()
+{
+  Serial.begin(115200);
+
+  // initialize EEPROM with predefined size
+  EEPROM.begin(EEPROM_SIZE);
+
+  EEPROM.put(0, ssid);
+  EEPROM.put(64, ssid2);
+  EEPROM.commit();
+  
+  // read the last LED state from flash memory
+}
+
+void loop()
+{
+  // read the state of the switch into a local variable:
+
+  EEPROM.get(0, string1);
+  String test(string1);
+  Serial.print("Wert1: ");
+  Serial.println(test);
+  delay(1000);
+  EEPROM.get(64, string1);
+  String test2(string1);
+  Serial.print("Wert2: ");
+  Serial.println(test2);
+  delay(1000);
+}
