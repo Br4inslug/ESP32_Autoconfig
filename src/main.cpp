@@ -26,7 +26,7 @@ void setup()
   webConfig1.init();
 
   //webConfig1.printInputs();
-  //Debug
+  
   wifimqtt.setConfig(webConfig1.getInputValue("SSID"), webConfig1.getInputValue("Password"), webConfig1.getInputValue("MQTT-Server"), webConfig1.getInputValue("ESP-Name"));
   wifimqtt.setup(callback);
 }
