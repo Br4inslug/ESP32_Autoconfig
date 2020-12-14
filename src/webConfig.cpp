@@ -31,7 +31,7 @@ void webConfig::addinput(String input1)
 
 void webConfig::writeToEeprom()
 {
-	int currentaddress = 0;
+	int currentaddress = sizeof(currentaddress);
 
 	//EEPROM.put(currentaddress, set);
 	//currentaddress = currentaddress + sizeof(set);
@@ -93,7 +93,8 @@ void webConfig::checkEeprom()
 {
 	//TODO hier weitermachen
 	//	bool check;
-	int currentaddress = 0;
+	int currentaddress = sizeof(currentaddress);
+
 	//	EEPROM.get(currentaddress, check);
 	//	currentaddress = currentaddress + sizeof(check);
 
@@ -122,10 +123,28 @@ void webConfig::init()
 
 	pinMode(pinNumber, INPUT);
 	EEPROM.begin(EEPROM_SIZE);
-	int Push_button_state = digitalRead(pinNumber);
 
-	if (Push_button_state == HIGH)
+	double start = millis();
+	bool reset = false;
+	while (start + 4000 > millis())
 	{
+		if (!reset)
+		{
+			resetcounter = EEPROM.read(0);
+			resetcounter = resetcounter + 1;
+			Serial.print("Resetcounter: ");
+
+			Serial.println(resetcounter);
+			EEPROM.write(0, resetcounter);
+			EEPROM.commit();
+
+			reset = true;
+		}
+	}
+
+	if (resetcounter >= 3)
+	{
+		EEPROM.begin(EEPROM_SIZE);
 		Serial.println("Reset!");
 		Serial.print("Setting AP (Access Point)…");
 		const char *id = "ESP-WebConfig";
@@ -138,12 +157,15 @@ void webConfig::init()
 		Serial.println(IP);
 		server.begin();
 		config();
+		EEPROM.write(0, 0);
 		writeToEeprom();
 	}
 	else
 	{
+		EEPROM.begin(EEPROM_SIZE);
 		Serial.println("Normal Operation!");
-
+		EEPROM.write(0, 0);
+		EEPROM.commit();
 		checkEeprom();
 	}
 }
@@ -247,52 +269,52 @@ void webConfig::config()
 							//	Serial.print(header);
 
 							String index_html1 = R"rawliteral(
-<!DOCTYPE html>
-<html>
-<head>
-<style> 
-input[type=button], input[type=submit], input[type=reset] {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 10px 32px;
-  text-decoration: none;
-  margin: 4px 2px;
-  cursor: pointer;
-  font-family: Verdana;
-  font-size: 40px;
-  border-radius: 12px;
-}
-input[type=text]{
-  background-color:#ffad33;
-  border: none;
-  color: white;
-  padding: 5px 5px;
-  text-decoration: none;
-  margin: 4px 2px;
-  cursor: pointer;
-  font-size: 40px;
-}
-body {
-  background-color: darkgrey;
-  color: black;
-  font-family: Verdana;
-   text-align: center;
-  font-size: 40px;
-}
-p {
-  font-family: Verdana;
-}
-</style>
-</head>
-<body>
+												<!DOCTYPE html>
+												<html>
+												<head>
+												<style> 
+												input[type=button], input[type=submit], input[type=reset] {
+												background-color: #4CAF50;
+												border: none;
+												color: white;
+												padding: 10px 32px;
+												text-decoration: none;
+												margin: 4px 2px;
+												cursor: pointer;
+												font-family: Verdana;
+												font-size: 40px;
+												border-radius: 12px;
+												}
+												input[type=text]{
+												background-color:#ffad33;
+												border: none;
+												color: white;
+												padding: 5px 5px;
+												text-decoration: none;
+												margin: 4px 2px;
+												cursor: pointer;
+												font-size: 40px;
+												}
+												body {
+												background-color: darkgrey;
+												color: black;
+												font-family: Verdana;
+												text-align: center;
+												font-size: 40px;
+												}
+												p {
+												font-family: Verdana;
+												}
+												</style>
+												</head>
+												<body>
 
-<p>WebConfig</p>
+												<p>WebConfig</p>
 
- <form action="/get">
-   
+												<form action="/get">
+												
 
-)rawliteral";
+												)rawliteral";
 
 							String index_html2;
 							std::map<String, String>::iterator it = input.begin();

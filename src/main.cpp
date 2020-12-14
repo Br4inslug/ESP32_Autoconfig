@@ -11,7 +11,6 @@ WiFiMQTT wifimqtt;
 void callback(char *topic, byte *payload, unsigned int length)
 {
   wifimqtt.callback1(topic, payload, length);
-  
 }
 
 void setup()
@@ -26,8 +25,10 @@ void setup()
   webConfig1.init();
 
   //webConfig1.printInputs();
-  
+
   wifimqtt.setConfig(webConfig1.getInputValue("SSID"), webConfig1.getInputValue("Password"), webConfig1.getInputValue("MQTT-Server"), webConfig1.getInputValue("ESP-Name"));
+  //delay(5000);
+
   wifimqtt.setup(callback);
 }
 

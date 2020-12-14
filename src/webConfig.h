@@ -40,6 +40,7 @@ private:
 	std::map<String, String> input;
 	bool set = false;
 	 int pinNumber ;
+	 int resetcounter;
 };
 
 #endif /* webConfig */
